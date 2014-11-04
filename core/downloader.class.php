@@ -68,7 +68,7 @@ class Downloader
 	/**
 	 * Downloader constructor
 	 *
-	 * Constructor will prepare file data and calculate start byte and end byte
+	 * Constructor will prepare data file and calculate start byte and end byte
 	 * 
 	 * @param string  $to_download    file path or data string
 	 * @param integer $download_mode  file mode or data mode

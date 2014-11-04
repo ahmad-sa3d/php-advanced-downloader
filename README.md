@@ -1,7 +1,7 @@
 php-advanced-downloader
 =======================
 
-php advanced downloader allow you to control file download process with many options and protecting file real paths
+php advanced downloader allow you to control file download process with many options and protecting real file paths
 
 
 Featutes:
