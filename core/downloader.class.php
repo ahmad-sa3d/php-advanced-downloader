@@ -205,7 +205,7 @@ class Downloader
 			// we will check if resumability is turned off we will ovverride the comming three lines to be non resumable
 			$this->_seek_start = ( $range[0] > 0 && $range[0] < $this->_full_size - 1 ) ? $range[0] : 0;
 
-			$this->_seek_end = ( $range[1] > 0 && $range[1] < $_full_size && $range[1] > $this->_seek_start ) ? $range[1] : $this->_full_size - 1;
+			$this->_seek_end = ( $range[1] > 0 && $range[1] < $this->_full_size && $range[1] > $this->_seek_start ) ? $range[1] : $this->_full_size - 1;
 
 			$this->_required_download_size = $this->_seek_end - $this->_seek_start + 1;
 
