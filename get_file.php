@@ -1,6 +1,7 @@
 <?php
 
-	require( './core/downloader.class.php' );
+
+	require( './core/downloader.php' );
 
 
 		$file = is_file( './files/' . @$_GET[ 'file' ] ) ?

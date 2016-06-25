@@ -1,17 +1,21 @@
 <?php
+
+	require( './core/autoload.php' );
+
+	use Core\Downloader as Downloader;
+	
 	
 	ini_set( 'display_errors', 1 );
+
 	error_reporting( E_ALL );
 	
 	if( isset( $_POST[ 'download' ] ) ):
-
-		require( './core/downloader.class.php' );
 	
 
 		$file = is_file( './files/' . @$_POST[ 'file' ] ) ?
-			'./files/' . @$_POST[ 'file' ]	// Download a file
+			'./files/' . @$_POST[ 'file' ]  // Download a file
 			:
-			@$_POST[ 'file' ];	// Download string, not prepend files folder path
+			@$_POST[ 'file' ];  // Download string, not prepend files folder path
 
 		
 		$save_as = !@$_POST['save_name'] ?: $_POST['save_name'];
@@ -46,11 +50,11 @@
 
 			$file = fopen( $path, 'a+t' );
 
-			fwrite( $file, $file_name . '	|	' . $bytes . " Bytes \n\r" );
+			fwrite( $file, $file_name . '   |   ' . $bytes . " Bytes \n\r" );
 
 			fclose( $file );
 			
-			// file_put_contents( '', $file_name . '	|	' . $bytes );
+			// file_put_contents( '', $file_name . '    |   ' . $bytes );
 		}
 
 		
@@ -227,7 +231,7 @@
 						<!-- Speed Limit -->
 						<p>
 							<label for="speed">Speed</label>
-							<input type="text" name="speed" id="speed" value="Unlimited 'use integers kBps'">
+							<input type="text" name="speed" id="speed" placeholder="Unlimited 'use integers kBps'" value="">
 						</p>
 
 						<!-- Download Mode -->

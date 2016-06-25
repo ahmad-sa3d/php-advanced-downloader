@@ -1,6 +1,5 @@
-<?php //namespace = 'Services/Download';
-
-
+<?php 
+namespace Core;
 /**
  * PHP Advanced Downloader
  *
@@ -18,14 +17,22 @@
  * @author    ahmed saad <a7mad.sa3d.2014@gmail.com>
  * @copyright ahmed saad 22 October 2014
  * @link      http://www.facebook.com/abu.sa3d
- * @version   1.0.0
+ * @version   1.2.0
  * @package   PHP Advanced Downloader
- * @license   GPL GNU V3.0
+ * @license   GPL GNU V3.0 
  * 
  */
+
+use Core\HttpErrorResponseTrait;
+
 class Downloader
 {
 
+	use HttpErrorResponseTrait;
+	
+	/**
+	 * Constants for Download Modes
+	 */
 	const DOWNLOAD_FILE = 1;
 	const DOWNLOAD_DATA = 2;
 	
@@ -86,19 +93,24 @@ class Downloader
 
 			$this->_download_mode = $download_mode;
 			
+			// Check if File exists and is file or not
 			if( !is_file( $to_download ) )
 			{
 				// Not Found
-				$this->_setHeader( 'HTTP/1.0 404 File Not Found' );
+				// $this->_setHeader( 'HTTP/1.0 404 File Not Found' );
 				
-				exit();
-			}
-			else if( !is_readable( $to_download ) || !( $this->_data = fopen( $to_download, 'rb' ) ) ) // Try To Open File
+				// exit();
+				$this->httpError( 404, 'File Not Found' );
+
+			}// Try To Open File for read
+			else if( !is_readable( $to_download ) || !( $this->_data = fopen( $to_download, 'rb' ) ) )
 			{
 				// File is not readable, couldnot open
-				$this->_setHeader( 'HTTP/1.0 403 Forbidden File Not Accissible.' );
+				// $this->_setHeader( 'HTTP/1.0 403 Forbidden File Not Accissible.' );
 				
-				exit();
+				// exit();
+
+				$this->httpError( 403, 'File Not Accissible' );
 			}
 
 			$this->_full_size = filesize( $to_download );
@@ -124,7 +136,7 @@ class Downloader
 
 			if( is_file( $to_download ) )
 			{
-				// the given is a file so we will convert it to data string
+				// the given is a file so we will get it as string data
 				$this->_data = file_get_contents( $to_download );
 
 				// $this->_data = implode( '', file( $to_download ) );
@@ -166,9 +178,11 @@ class Downloader
 		else
 		{
 			// Bad Request
-			$this->_setHeader( 'HTTP/1.0 400 Bad Request Download Mode Error' );
+			// $this->_setHeader( 'HTTP/1.0 400 Bad Request Download Mode Error' );
 
-			exit();
+			// exit();
+
+			$this->httpError( 400, 'Bad Request, Undefined Download Mode' );
 
 		}
 
@@ -185,9 +199,11 @@ class Downloader
 			if( stripos( 'bytes' ) === false )
 			{
 				// Bad Request for range
-				$this->_setHeader( 'HTTP/1.0 416 Requested Range Not Satisfiable' );
+				// $this->_setHeader( 'HTTP/1.0 416 Requested Range Not Satisfiable' );
 
-				exit();
+				// exit();
+
+				$this->httpError( 416 );
 			}
 
 			$range = substr( $http_range , strlen('bytes=') );
@@ -201,7 +217,7 @@ class Downloader
 			// seek_start = 0, seek_end = 99
 
 			// Set Seek
-			// Let Keep Default behaviour to be resumable, later immeduiatelt after downloading
+			// Let Keep Default behaviour to be resumable, later immediately before downloading
 			// we will check if resumability is turned off we will ovverride the comming three lines to be non resumable
 			$this->_seek_start = ( $range[0] > 0 && $range[0] < $this->_full_size - 1 ) ? $range[0] : 0;
 
@@ -242,11 +258,13 @@ class Downloader
 		if( $this->_use_authentiaction )
 		{
 
+			// Try To Use Basic WWW-Authenticate
 			if( !$this->_authenticate() )
 			{
 
 				// Authenticate Headers, this Will Popup authentication process then redirect back to the same request with provided username, password
-				$this->_setHeader( 'WWW-Authenticate', 'Basic realm="This Process Require authentication, please provide your cridentials."' );
+				
+				$this->_setHeader( 'WWW-Authenticate', 'Basic realm="This Process Require authentication, please provide your Credentials."' );
 
 				$this->_setHeader( 'HTTP/1.0 401 Unauthorized' );
 
@@ -331,8 +349,10 @@ class Downloader
 		// clean any output buffer
 		@ob_end_clean();
 		
-		// ignore user abort and get current setting in a handler
-		$old_user_abort_setting = ignore_user_abort( true );
+		// get oignore_user_abort value, then change it to yes
+		$old_user_abort_setting = ignore_user_abort();
+		ignore_user_abort( true );
+
 
 		// set script execution time to be unlimited
 		@set_time_limit( 0 );
@@ -348,6 +368,7 @@ class Downloader
 
 			$downloaded = 0;
 
+			// goto the position of the first byte to download
 			fseek( $this->_data,  $this->_seek_start );
 
 			while( $bytes_to_download > 0 && !( connection_aborted() || connection_status() == 1 ) )
@@ -366,6 +387,7 @@ class Downloader
 				else
 				{
 					// send required size
+					// this will happens when we reaches the end of the file normally we wll download remaining bytes
 					echo fread( $this->_data, $bytes_to_download );	// this also will seek to last reat	
 					
 					$downloaded += $bytes_to_download; 	// Add to downloaded
@@ -388,6 +410,7 @@ class Downloader
 			}
 
 
+			// all bytes have been sent to user
 			// Close File
 			fclose( $this->_data );
 
@@ -691,9 +714,12 @@ class Downloader
 	{
 		// Initializing code goes here
 		
-		// turn off compression on the server
+		// allow for sending partial contents to browser, so turn off compression on the server and php config
+		
+		// Disables apache compression mod_deflate || mod_gzip
 		@apache_setenv( 'no-gzip', 1 );
 
+		// disable php cpmpression
 		@ini_set( 'zlib.output_compression', 'Off' );
 		
 	}
