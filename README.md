@@ -12,7 +12,12 @@
 >@author	Ahmed Saad <a7mad.sa3d.2014@gmail.com>
 
 ### Version
-> 2.1.0
+> 1.2.1 
+>> Updated at : *`7 Jul 2016`*
+
+>> ### Changelog :
+
+>> Fix Byte range end ( By	chardinge1 )
 
 
 ----
