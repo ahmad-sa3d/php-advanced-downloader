@@ -717,7 +717,10 @@ class Downloader
 		// allow for sending partial contents to browser, so turn off compression on the server and php config
 		
 		// Disables apache compression mod_deflate || mod_gzip
-		@apache_setenv( 'no-gzip', 1 );
+		if ( function_exists( 'apache_setenv' ) )
+		{
+			@apache_setenv( 'no-gzip', 1 );
+		}
 
 		// disable php cpmpression
 		@ini_set( 'zlib.output_compression', 'Off' );
